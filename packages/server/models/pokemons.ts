@@ -49,3 +49,45 @@ export function query(args: {
   );
   return toConnection(results, limit);
 }
+
+export function queryByType(args: {
+  type?: string;
+  after?: string;
+  limit?: number;
+  q?: string;
+}): Connection<Pokemon> {
+  const { type, after, q, limit = SIZE } = args;
+
+  const filterByQ: (as: Pokemon[]) => Pokemon[] =
+    // filter only if q is defined
+    q === undefined
+      ? identity
+      : A.filter(p => p.name.toLowerCase().includes(q.toLowerCase()));
+
+  const filterByType: (as: Pokemon[]) => Pokemon[] =
+    type === undefined
+      ? identity
+      : A.filter(p => p.types.map(type => type.toLowerCase()).includes(type.toLowerCase()));
+
+  const sliceByAfter: (as: Pokemon[]) => Pokemon[] =
+    // filter only if q is defined
+    after === undefined
+      ? identity
+      : as =>
+        pipe(
+          as,
+          A.findIndex(a => a.id === after),
+          O.map(a => a + 1),
+          O.fold(() => as, idx => as.slice(idx))
+        );
+
+  const results: Pokemon[] = pipe(
+    data,
+    filterByType,
+    filterByQ,
+    sliceByAfter,
+    // slicing limit + 1 because the `toConnection` function should known the connection size to determine if there are more results
+    slice(0, limit + 1)
+  );
+  return toConnection(results, limit);
+}
