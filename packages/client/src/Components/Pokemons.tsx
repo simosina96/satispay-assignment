@@ -45,6 +45,7 @@ export default function Pokemons() {
                             return {
                                 key: edge.node.id,
                                 name: edge.node.name,
+                                classification: edge.node.classification,
                                 types: edge.node.types.join(', '),
                             };
                         })

@@ -12,6 +12,7 @@ query pokemons($after:ID!) {
         node {
             id
             name
+            classification
             types
         }
       }
