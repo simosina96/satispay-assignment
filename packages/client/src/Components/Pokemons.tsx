@@ -1,8 +1,13 @@
-import { useQuery } from '@apollo/client';
+import { useLazyQuery } from '@apollo/client';
 import { GET_POKEMONS } from '../GraphQL/Queries';
 import { Table } from 'antd';
-import { Button } from 'antd';
+import { Button, Input, Dropdown, Menu, Select } from 'antd';
 import { useState, useEffect } from 'react';
+import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
+
+// const { Search } = Input;
+
+const { Option } = Select;
 
 const columns = [
     {
@@ -24,12 +29,18 @@ const columns = [
 
 export default function Pokemons() {
 
-    const [dataSource, setDataSource] = useState()
+    const [dataSource, setDataSource] = useState();
+    const [query, setQuery] = useState("");
+    const [type, setType] = useState(undefined);
 
-    const { data, error, loading, fetchMore } = useQuery(GET_POKEMONS, {
-        variables: { after: '' },
+    const [getPokemons, { data, error, loading, fetchMore }] = useLazyQuery(GET_POKEMONS, {
+        variables: { after: '', query: '' },
         notifyOnNetworkStatusChange: true,
     })
+
+    useEffect(() => {
+        getPokemons();
+    }, [getPokemons]);
 
     useEffect(() => {
         if (data) {
@@ -42,19 +53,95 @@ export default function Pokemons() {
                         types: edge.node.types.join(', '),
                     };
                 })
-            )
+            );
         }
     }, [data])
 
     if (error) {
-        console.log(error.message);
         return <div>An error occurred</div>
+    }
+
+    /*
+    const onSearch = (value: string) => {
+        getPokemons({ variables: { after: '', query: value } })
+    }
+    */
+
+    /*
+    const onInputChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setQuery(value);
+        getPokemons({ variables: { after: '', query: value } });
+    }
+    */
+
+    const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setQuery(value);
+    }
+
+    function onSelectionChange(value: any) {
+        setType(value);
+    }
+
+    function submit() {
+        if (type) {
+            // search using "pokemonsByType" query
+
+            // TODO
+
+        } else {
+            // search using "pokemons" query
+            getPokemons({ variables: { after: '', query: query } });
+        }
     }
 
     const hasNextPage = data?.pokemons.pageInfo.hasNextPage;
 
     return (
         <div style={{ width: '70%' }}>
+
+            <div style={{ display: 'flex', flexDirection: 'row', paddingTop: '16px', paddingBottom: '16px', gap: '8px' }}>
+                {/* <Search placeholder="Search Pokèmons" allowClear onSearch={onSearch} style={{ width: 200 }} /> */}
+                {/* <Input placeholder="Search Pokèmons" allowClear onChange={onInputChangeSearch} value={query} style={{ width: 200 }} /> */}
+                <Input placeholder="Search Pokèmons" allowClear onChange={onInputChange} value={query} />
+
+                <Select
+                    style={{ width: '400px', textAlign: 'left' }}
+                    clearIcon={true}
+                    placeholder="Type"
+                    optionFilterProp="children"
+                    onChange={onSelectionChange}
+                    value={type}
+                    filterOption={(input, option) =>
+                        option?.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                >
+                    <Option value="jack">Jack</Option>
+                    <Option value="lucy">Lucy</Option>
+                    <Option value="tom">Tom</Option>
+                </Select>
+
+                <Button
+                    style={{ width: '150px' }}
+                    type="primary"
+                    icon={<SearchOutlined />}
+                    disabled={!query && !type}
+                    onClick={submit}
+                >Search</Button>
+
+                <Button
+                    style={{ width: '150px' }}
+                    type="primary" danger
+                    icon={<CloseOutlined />}
+                    onClick={() => {
+                        setQuery("");
+                        setType(undefined);
+                        getPokemons({ variables: { after: '', query: '' } });
+                    }}
+                >Reset</Button>
+            </div>
+
             {/* <p>{data?.pokemons.edges.length} Pokèmons fetched.</span></p> */}
             <Table bordered={true} loading={loading} showHeader={true} pagination={false} dataSource={dataSource} columns={columns} />
 
@@ -65,7 +152,7 @@ export default function Pokemons() {
                             variables: { after: data.pokemons.pageInfo.endCursor, }
                         })
                     }}
-                >Fetch more</Button>
+                >See more</Button>
             )}
 
         </div>
