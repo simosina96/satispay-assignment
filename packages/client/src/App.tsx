@@ -1,7 +1,8 @@
+import './App.css';
 import { ApolloClient, InMemoryCache, ApolloProvider, HttpLink, from } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
-import './App.css';
-import Pokemons from "./Components/Pokemons"
+import Pokemons from './Components/Pokemons';
+import { relayStylePagination } from "@apollo/client/utilities";
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors) {
@@ -18,7 +19,15 @@ const link = from([
 ]);
 
 const client = new ApolloClient({
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          pokemons: relayStylePagination(),
+        },
+      },
+    },
+  }),
   link: link,
 });
 
@@ -28,9 +37,8 @@ function App() {
       <div className="App">
         <header className="App-header">
           Pokèmons
+          <Pokemons />
         </header>
-        {" "}
-        <Pokemons />
       </div>
     </ApolloProvider>
   );

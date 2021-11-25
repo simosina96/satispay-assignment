@@ -1,14 +1,20 @@
 import { gql } from '@apollo/client'
 
-export const LOAD_POKEMONS = gql`
-    query {
-        pokemons (after:"010") {
-            edges {
-                node {
-                    id
-                    name
-                }
-            }
+export const GET_POKEMONS = gql`
+query pokemons($after:ID!) {
+    pokemons(after:$after, limit:10) {
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+      edges {
+        cursor
+        node {
+            id
+            name
+            types
         }
+      }
     }
+  }
 `
