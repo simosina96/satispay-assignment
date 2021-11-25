@@ -1,11 +1,9 @@
 import { useLazyQuery } from '@apollo/client';
-import { GET_POKEMONS } from '../GraphQL/Queries';
+import { GET_POKEMONS, GET_POKEMONS_BY_TYPE } from '../GraphQL/Queries';
 import { Table } from 'antd';
-import { Button, Input, Dropdown, Menu, Select } from 'antd';
+import { Button, Input, Select } from 'antd';
 import { useState, useEffect } from 'react';
 import { SearchOutlined, CloseOutlined } from '@ant-design/icons';
-
-// const { Search } = Input;
 
 const { Option } = Select;
 
@@ -36,7 +34,7 @@ export default function Pokemons() {
     const [getPokemons, { data, error, loading, fetchMore }] = useLazyQuery(GET_POKEMONS, {
         variables: { after: '', query: '' },
         notifyOnNetworkStatusChange: true,
-    })
+    });
 
     useEffect(() => {
         getPokemons();
@@ -60,20 +58,6 @@ export default function Pokemons() {
     if (error) {
         return <div>An error occurred</div>
     }
-
-    /*
-    const onSearch = (value: string) => {
-        getPokemons({ variables: { after: '', query: value } })
-    }
-    */
-
-    /*
-    const onInputChangeSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setQuery(value);
-        getPokemons({ variables: { after: '', query: value } });
-    }
-    */
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
@@ -102,8 +86,6 @@ export default function Pokemons() {
         <div style={{ width: '70%' }}>
 
             <div style={{ display: 'flex', flexDirection: 'row', paddingTop: '16px', paddingBottom: '16px', gap: '8px' }}>
-                {/* <Search placeholder="Search Pokèmons" allowClear onSearch={onSearch} style={{ width: 200 }} /> */}
-                {/* <Input placeholder="Search Pokèmons" allowClear onChange={onInputChangeSearch} value={query} style={{ width: 200 }} /> */}
                 <Input placeholder="Search Pokèmons" allowClear onChange={onInputChange} value={query} />
 
                 <Select
@@ -143,10 +125,11 @@ export default function Pokemons() {
             </div>
 
             {/* <p>{data?.pokemons.edges.length} Pokèmons fetched.</span></p> */}
-            <Table bordered={true} loading={loading} showHeader={true} pagination={false} dataSource={dataSource} columns={columns} />
+            <Table bordered={true} loading={loading} showHeader={true} pagination={false} dataSource={dataSource} columns={columns}
+                style={{ marginBottom: "16px" }} />
 
             {hasNextPage && (
-                <Button type="primary"
+                <Button type="link" style={{ width: '100%', marginBottom: "16px" }}
                     onClick={() => {
                         fetchMore({
                             variables: { after: data.pokemons.pageInfo.endCursor, }
