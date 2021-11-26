@@ -127,7 +127,7 @@ export default function Pokemons() {
     }, [data])
 
     if (error) {
-        return <div>An error occurred</div>
+        return <div>An error occurred...</div>
     }
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
