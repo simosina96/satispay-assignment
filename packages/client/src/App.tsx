@@ -37,8 +37,8 @@ function App() {
       <div className="App">
         <header className="App-header">
           Pokèmons
-          <Pokemons />
         </header>
+        <Pokemons />
       </div>
     </ApolloProvider>
   );

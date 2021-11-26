@@ -21,7 +21,6 @@ type PokemonsConnection {
 }
 
 type Query {
-  pokemons(q: String, after: ID, limit: Int): PokemonsConnection
-
-  pokemonsByType(type: String!, q: String, after: ID, limit: Int): PokemonsConnection
+  pokemons(type: String, q: String, after: ID, limit: Int): PokemonsConnection
+  pokemonsByType(type: String, q: String, after: ID, limit: Int): PokemonsConnection
 }
