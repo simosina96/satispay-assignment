@@ -154,6 +154,7 @@ export default function Pokemons() {
                     onChange={onSelectionChange}
                     allowClear
                     showSearch
+                    value={type}
                     filterOption={(input, option) =>
                         option?.value.toLowerCase().indexOf(input.toLowerCase()) >= 0
                     }
